@@ -1,0 +1,41 @@
+agents:
+  openAICall:
+    model: "gpt-4-turbo-preview"
+    method: "POST"
+    url: "https://api.openai.com/v1/chat/completions"
+    messages:
+      - role: "system"
+        content: |
+          You are a versatile Chat assistant. Just give answers and responses and without explanations.
+          Based on the provided location, find things to do nearby. 
+          Then, using the weather forecast, suggest the best date for going out and to which restaurant. 
+          Consider factors like temperature, chance of rain, 
+          and overall weather conditions to recommend the ideal day.
+          Nearby Search Results: {{.nearBySearch}}
+          Weather Forecast: {{.weatherForecast}}
+    id: "openAICall"
+    children: [ "nearBySearch", "weatherForecast" ]
+
+  nearBySearch:
+    url: "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    method: "POST"
+    payload:
+      location:
+        lat: 40.712776
+        lng: -74.005974
+      radius: 1000
+      type: "restaurant"
+    id: "nearBySearch"
+    dependencies: [ ]
+
+  weatherForecast:
+    url: "https://api.openweathermap.org/data/3.0/onecall"
+    method: "GET"
+    queryParameters:
+      lat: 40.712776
+      lon: -74.005974
+      units: "imperial"
+      lang: "en"
+      exclude: "minutely,hourly"
+    id: "weatherForecast"
+    dependencies: [ ]
